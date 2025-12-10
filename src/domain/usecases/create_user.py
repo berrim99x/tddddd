@@ -7,8 +7,7 @@ class CreateUserUseCase:
         self.repo = repo
 
     def execute(self, dto: CreateUserDTO) -> CreateUserResponseDTO:
-        existing = self.repo.find_by_email(dto.email)
-        if existing:
+        if self._email_exists(dto.email):
             return CreateUserResponseDTO(False, "Email already exists", None)
 
         user = User(None, dto.name, dto.email)
@@ -18,3 +17,6 @@ class CreateUserUseCase:
             return CreateUserResponseDTO(True, "User created", saved.id)
         except Exception as e:
             return CreateUserResponseDTO(False, str(e), None)
+
+    def _email_exists(self, email: str) -> bool:
+        return self.repo.find_by_email(email) is not None
