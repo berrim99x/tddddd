@@ -41,3 +41,15 @@ def test_create_user_fails_with_invalid_email_format():
 
     assert res.success is False
     assert "invalid" in res.message.lower()
+
+def test_create_user_fails_when_name_is_empty():
+    repo = Mock()
+    repo.find_by_email.return_value = None
+    usecase = CreateUserUseCase(repo)
+
+    dto = CreateUserDTO(name="", email="valid@example.com")
+
+    res = usecase.execute(dto)
+
+    assert res.success is False
+    assert "name" in res.message.lower()
