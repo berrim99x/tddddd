@@ -1,17 +1,24 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from src.application.dto.user_dto import CreateUserDTO
-from src.application.presenters.user_presenter import UserPresenter
-from src.domain.usecases.create_user import CreateUserUseCase
-from src.infrastructure.repositories.memory_user_repository import MemoryUserRepository
+from src.infrastructure.factories.user_factory import UserFactory
+from src.interface.requests.create_user_request import CreateUserRequest
+from src.interface.responses.create_user_response import CreateUserResponse
 
 router = APIRouter()
 
-repo = MemoryUserRepository()
-usecase = CreateUserUseCase(repo)
-presenter = UserPresenter()
+def get_usecase():
+    return UserFactory.create_usecase()
 
-@router.post("/users")
-def create_user(payload: CreateUserDTO):
-    response = usecase.execute(payload)
+def get_presenter():
+    return UserFactory.create_presenter()
+
+@router.post("/users", response_model=CreateUserResponse)
+def create_user(
+    request: CreateUserRequest,
+    usecase = Depends(get_usecase),
+    presenter = Depends(get_presenter)
+):
+    dto = CreateUserDTO(name=request.name, email=request.email)
+    response = usecase.execute(dto)
     vm = presenter.present(response)
-    return vm
+    return CreateUserResponse(**vm.__dict__)
