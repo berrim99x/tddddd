@@ -1,11 +1,11 @@
 from unittest.mock import Mock
 from src.domain.usecases.create_user import CreateUserUseCase
 from src.application.dto.user_dto import CreateUserDTO
+from src.application.presenters.user_presenter import UserPresenter
+from src.application.dto.user_dto import CreateUserResponseDTO
 import pytest
 
-from unittest.mock import Mock
-from src.domain.usecases.create_user import CreateUserUseCase
-from src.application.dto.user_dto import CreateUserDTO
+
 
 def test_create_user_should_fail_when_repo_throws():
     repo = Mock()
@@ -53,3 +53,19 @@ def test_create_user_fails_when_name_is_empty():
 
     assert res.success is False
     assert "name" in res.message.lower()
+
+
+def test_presenter_converts_response_to_viewmodel():
+    presenter = UserPresenter()
+
+    response = CreateUserResponseDTO(
+        success=True,
+        message="User created",
+        user_id=10
+    )
+
+    vm = presenter.present(response)
+
+    assert vm["success"] is True
+    assert vm["message"] == "User created"
+    assert vm["user_id"] == 10
