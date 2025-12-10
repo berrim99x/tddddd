@@ -7,6 +7,9 @@ class CreateUserUseCase:
         self.repo = repo
 
     def execute(self, dto: CreateUserDTO) -> CreateUserResponseDTO:
+        if "@" not in dto.email:
+            return CreateUserResponseDTO(False, "Invalid email format", None)
+
         if self._email_exists(dto.email):
             return CreateUserResponseDTO(False, "Email already exists", None)
 
