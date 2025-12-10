@@ -19,3 +19,13 @@ def test_create_user_should_fail_when_repo_throws():
     assert res.success is False
     assert "db error" in res.message.lower()
 
+def test_create_user_fails_when_email_already_exists():
+    repo = Mock()
+    repo.find_by_email.return_value = {"id": 1, "name": "Old", "email": "test@example.com"}
+    usecase = CreateUserUseCase(repo)
+
+    dto = CreateUserDTO(name="New User", email="test@example.com")
+    res = usecase.execute(dto)
+
+    assert res.success is False
+    assert "exists" in res.message.lower()
