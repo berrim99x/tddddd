@@ -2,14 +2,17 @@ from src.application.dto.user_dto import CreateUserDTO, CreateUserResponseDTO
 from src.domain.entities.user import User
 from src.domain.repositories.user_repository import UserRepository
 from src.domain.value_objects.email import Email
+from src.domain.value_objects.name import Name
 
 class CreateUserUseCase:
     def __init__(self, repo: UserRepository):
         self.repo = repo
 
     def execute(self, dto: CreateUserDTO) -> CreateUserResponseDTO:
-        if not dto.name.strip():
-            return CreateUserResponseDTO(False, "Name cannot be empty", None)
+        try:
+            name = Name(dto.name)
+        except Exception as e:
+            return CreateUserResponseDTO(False, str(e), None)
 
         try:
             email = Email(dto.email)
@@ -19,7 +22,7 @@ class CreateUserUseCase:
         if self._email_exists(dto.email):
             return CreateUserResponseDTO(False, "Email already exists", None)
 
-        user = User(None, dto.name, email)
+        user = User(None, name, email)
 
         try:
             saved = self.repo.save(user)
