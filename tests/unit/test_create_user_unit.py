@@ -29,3 +29,15 @@ def test_create_user_fails_when_email_already_exists():
 
     assert res.success is False
     assert "exists" in res.message.lower()
+
+def test_create_user_fails_with_invalid_email_format():
+    repo = Mock()
+    repo.find_by_email.return_value = None
+    usecase = CreateUserUseCase(repo)
+
+    dto = CreateUserDTO(name="Test User", email="invalid-email")
+
+    res = usecase.execute(dto)
+
+    assert res.success is False
+    assert "invalid" in res.message.lower()
