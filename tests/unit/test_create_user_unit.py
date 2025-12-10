@@ -66,6 +66,6 @@ def test_presenter_converts_response_to_viewmodel():
 
     vm = presenter.present(response)
 
-    assert vm["success"] is True
-    assert vm["message"] == "User created"
-    assert vm["user_id"] == 10
+    assert vm.success is True
+    assert vm.message == "User created"
+    assert vm.user_id == 10
