@@ -8,6 +8,9 @@ class CreateUserUseCase:
         self.repo = repo
 
     def execute(self, dto: CreateUserDTO) -> CreateUserResponseDTO:
+        if not dto.name.strip():
+            return CreateUserResponseDTO(False, "Name cannot be empty", None)
+
         try:
             email = Email(dto.email)
         except Exception as e:
