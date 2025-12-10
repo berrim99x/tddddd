@@ -1,1 +1,2 @@
-
+def app():
+    return None
